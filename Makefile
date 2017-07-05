@@ -21,10 +21,11 @@ endif
 default: help
 
 all:	##@development shorthand for 'build up setup open'
+all: build up setup open
+all:
 	#
-	# hola
-	#
-	build up setup open
+	# make all
+	# Done.
 
 build:	##@docker build application images
 	#
