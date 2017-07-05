@@ -1,0 +1,47 @@
+version: '2'
+services:
+  nginx:
+    image: nginx:1.13-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/custom.conf
+      - .:/var/www/html
+    links:
+      - php
+      - node
+
+  php:
+    build: .
+    volumes:
+      - ./config/php.ini:/usr/local/etc/php/conf.d/custom.ini
+      - .:/var/www/html
+    depends_on:
+      - mariadb
+    environment:
+      - GITHUB_API_TOKEN=${GITHUB_API_TOKEN}
+
+  mariadb:
+    image: mariadb:10.2
+    volumes:
+      - ./config/mysql.cnf:/etc/mysql/conf.d/custom.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=dbroot
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+
+  node:
+    image: node:8.1-alpine
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    user: node
+    command: sh -c "npm install && npm start"
+    ports:
+      - 5001:5001
+    expose:
+      - 5001
+
+volumes:
+  deps:
